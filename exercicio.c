@@ -12,7 +12,6 @@
 #include <time.h>
 
 int main(int argc, char** argv) {
-  const int PING_PONG_LIMIT = 10;
   // Initialize the MPI environment. The two arguments to MPI Init are not
   // currently used by MPI implementations, but are there in case future
   // implementations might need the arguments.
@@ -27,7 +26,7 @@ int main(int argc, char** argv) {
   
   // Get the rank of the process
   int world_rank;
-  int soma;
+  int soma = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
   const int MAX_NUMBERS = 2000;
@@ -39,8 +38,8 @@ int main(int argc, char** argv) {
     for(int i = 0; i < number_amount; i++){
         numbers[i] = rand() % 100;
     }
-    MPI_Send(numbers, number_amount, MPI_INT, 1, 1+world_rank, MPI_COMM_WORLD);
-    printf("0 sent %d numbers to %d\n", number_amount, 1+world_rank);
+    MPI_Send(numbers, number_amount, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    printf("0 sent %d numbers to %d\n", number_amount, 1);
 
   } else {
     MPI_Status status;

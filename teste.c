@@ -11,7 +11,8 @@ int main () {
     srand(time(NULL)); 
 
     number_amount = 1000 + rand() % (MAX_NUMBERS - 1000 + 1);
+    printf("%d quantidade de numeros", number_amount);
     for(int i = 0; i < number_amount; i++){
-        printf("%d ", rand() % 100);
+        //printf("%d ", rand() % 100);
     }
 }
