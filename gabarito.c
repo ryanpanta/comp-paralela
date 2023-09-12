@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     for(int p = 1; p < world_size; p++){
       number_amount = 1000 + (rand() / (float)RAND_MAX) * (MAX_NUMBERS - 1000);
       for(int i = 0; i < number_amount; i++)
-        numbers[i] = (rand() / (float)RAND_MAX) * MAX_NUMBERS; // Para teste, substituir por 1; 
+        numbers[i] = (rand() / (float)RAND_MAX) * 100; // Para teste, substituir por 1; 
       // Send the amount of integers to process one
       MPI_Send(numbers, number_amount, MPI_INT, p, 0, MPI_COMM_WORLD);
       printf("0 sent %d numbers to %d\n", number_amount, p);

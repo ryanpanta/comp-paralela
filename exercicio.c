@@ -30,19 +30,21 @@ int main(int argc, char** argv) {
   const int MAX_NUMBERS = 2000;
   int numbers[MAX_NUMBERS];
   int number_amount;
-  int m;
 
   if(world_rank == 0) {
 
     srand(time(NULL));
 
-    for(m = 1; m < world_size; m++){
+    for(int m = 1; m < world_size; m++){
         number_amount = 1000 + rand() % (MAX_NUMBERS - 1000 + 1);
         for(int i = 0; i < number_amount; i++){
           numbers[i] = rand() % 100;
         }
         MPI_Send(numbers, number_amount, MPI_INT, m, 0, MPI_COMM_WORLD);
         printf("0 sent %d numbers to %d\n", number_amount, m);
+        soma = 0;
+    }
+    for(int m = 1; m < world_size; m++){
         MPI_Recv(&soma, 1, MPI_INT, m, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         somatotal += soma;
     }
@@ -56,12 +58,10 @@ int main(int argc, char** argv) {
     for(int i = 0; i < number_amount; i++)
         soma += numbers[i];
     MPI_Send(&soma, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-    printf(" %d somou: %d  \n", m, soma);
+    printf("%d somou: %d  \n", world_rank, soma);
   }
-
+  
   MPI_Barrier(MPI_COMM_WORLD);
-
-  // Finalize the MPI environment. No more MPI calls can be made after this
   MPI_Finalize();
 
 }
