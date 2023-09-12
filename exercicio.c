@@ -12,34 +12,41 @@
 #include <time.h>
 
 int main(int argc, char** argv) {
-  // Initialize the MPI environment. The two arguments to MPI Init are not
-  // currently used by MPI implementations, but are there in case future
-  // implementations might need the arguments.
   MPI_Init(NULL, NULL);
   // Get the number of processes
   int world_size;
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-  if(world_size != 2) {
+/*   if(world_size != 2) {
         fprintf(stderr, "Must use two processes for this example\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
-  }
+  } */
   
   // Get the rank of the process
   int world_rank;
   int soma = 0;
+  int somatotal = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
   const int MAX_NUMBERS = 2000;
   int numbers[MAX_NUMBERS];
   int number_amount;
+  int m;
+
   if(world_rank == 0) {
+
     srand(time(NULL));
-    number_amount = 1000 + rand() % (MAX_NUMBERS - 1000 + 1);
-    for(int i = 0; i < number_amount; i++){
-        numbers[i] = rand() % 100;
+
+    for(m = 1; m < world_size; m++){
+        number_amount = 1000 + rand() % (MAX_NUMBERS - 1000 + 1);
+        for(int i = 0; i < number_amount; i++){
+          numbers[i] = rand() % 100;
+        }
+        MPI_Send(numbers, number_amount, MPI_INT, m, 0, MPI_COMM_WORLD);
+        printf("0 sent %d numbers to %d\n", number_amount, m);
+        MPI_Recv(&soma, 1, MPI_INT, m, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        somatotal += soma;
     }
-    MPI_Send(numbers, number_amount, MPI_INT, 1, 0, MPI_COMM_WORLD);
-    printf("0 sent %d numbers to %d\n", number_amount, 1);
+    printf("A soma total foi de: %d \n", somatotal);
 
   } else {
     MPI_Status status;
@@ -48,8 +55,8 @@ int main(int argc, char** argv) {
     printf("%d received %d numbers from 0. Message source = %d, tag = %d\n", world_rank, number_amount, status.MPI_SOURCE, status.MPI_TAG);
     for(int i = 0; i < number_amount; i++)
         soma += numbers[i];
-    printf("Soma: %d ", soma);
-
+    MPI_Send(&soma, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+    printf(" %d somou: %d  \n", m, soma);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
